@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+
 	"github.com/abires/dns/header"
+	"github.com/abires/dns/network"
 )
 
 var (
@@ -13,9 +15,14 @@ var (
 func main() {
 	server := flag.String("ip", "8.8.8.8", "which server we are connecting to")
 	flag.Parse()
-	tmp := *server
-	fmt.Println(tmp)
-	header := &dnsHeader{}
-	header.setID("duckduckgo.com")
+	destination = *server + ":53"
+	header := &header.DNSHeader{}
+	header.SetID()
+	header.SetQuery(true)
+	header.SetNumberofQuestions(1)
+	header.SetNumberofNameServers(0)
+	header.SetNumberofAdditional(0)
 	fmt.Println(header)
+	stream := []byte{145, 150}
+	network.ConnectToDNSServer(destination, stream)
 }

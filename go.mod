@@ -1,5 +1,3 @@
-module abires/dns
-
-replace github.com/abires/dns/header => /home/comp/repos/dns/header
+module github.com/abires/dns
 
 go 1.14
