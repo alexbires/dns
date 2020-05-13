@@ -22,7 +22,10 @@ func main() {
 	header.SetNumberofQuestions(1)
 	header.SetNumberofNameServers(0)
 	header.SetNumberofAdditional(0)
-	fmt.Println(header)
-	stream := []byte{145, 150}
-	network.ConnectToDNSServer(destination, stream)
+	//fmt.Println(header)
+	headerBuffer := header.ToByteBuffer()
+	byteArray := headerBuffer.Bytes()
+	//stream := []byte{145, 150}
+	fmt.Println(byteArray)
+	network.ConnectToDNSServer(destination, byteArray)
 }

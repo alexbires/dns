@@ -5,6 +5,7 @@ import (
 	"net"
 )
 
+//ConnectToDNSServer does the actual connecting to the server
 func ConnectToDNSServer(destination string, data []byte) {
 	conn, err := net.Dial("udp", destination)
 

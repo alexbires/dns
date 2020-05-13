@@ -1,6 +1,7 @@
 package header
 
 import (
+	"bytes"
 	"crypto/rand"
 	"encoding/binary"
 	"fmt"
@@ -79,10 +80,23 @@ func (dh *DNSHeader) SetNumberofAdditional(additional uint16) {
 	dh.ARCNT = additional
 }
 
+func (dh *DNSHeader) assembleFlagByte() uint16 {
+	var header uint16 = 0
+	if dh.QR > 0 {
+		header = header | (uint16(1) << 15)
+	}
+	if dh.Opcode > 0 {
+		header = header | (uint16(1) << 11)
+	}
+	return header
+}
+
 //ToByteBuffer returns a byte buffer representation of the dns header
-func (dh *DNSHeader) ToByteBuffer() *[]byte {
-	ret := []byte{1}
-	return &ret
+func (dh *DNSHeader) ToByteBuffer() *bytes.Buffer {
+	ret := new(bytes.Buffer)
+	binary.Write(ret, binary.BigEndian, dh.ID)
+	binary.Write(ret, binary.BigEndian, dh.assembleFlagByte())
+	return ret
 }
 
 func (dh *DNSHeader) String() string {
