@@ -21,7 +21,7 @@ func main() {
 	header.SetQuery(true)
 	header.SetNumberofQuestions(1)
 	header.SetNumberofNameServers(0)
-	header.SetNumberofAdditional(0)
+	//header.SetNumberofAdditional(0)
 	//fmt.Println(header)
 	headerBuffer := header.ToByteBuffer()
 	byteArray := headerBuffer.Bytes()

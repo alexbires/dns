@@ -51,12 +51,14 @@ func (dh *DNSHeader) SetID() {
 
 //SetQuery sets the appropriate query bit and Opcode bit for the DNS header
 func (dh *DNSHeader) SetQuery(query bool) {
-	if query {
+	if query { //if we are querying.  We should set the QR bit to 0
 		dh.QR = 0
-		dh.Opcode = 0
-		dh.flags = 0
+		dh.Opcode = 0 // in this case we are just wanting to do a query
+		dh.flags = 2  // Recursion requested
 		dh.RCode = 0
 		dh.Z = 0
+		dh.NSCNT = 0 // this is the name server
+		dh.ARCNT = 0 //this is a question we aren't going to have any answers
 	} else {
 		dh.QR = 1
 		dh.Opcode = 1
@@ -80,14 +82,23 @@ func (dh *DNSHeader) SetNumberofAdditional(additional uint16) {
 	dh.ARCNT = additional
 }
 
+//takes all of the individual uint8 bytes making up the QR and Opcode and
+//combines them into one uint16 for easy assembly to the header
 func (dh *DNSHeader) assembleFlagByte() uint16 {
 	var header uint16 = 0
 	if dh.QR > 0 {
-		header = header | (uint16(1) << 15)
+		header = 32768 //MSB of a uint16 being set equivalent to hex value 0x8000
 	}
 	if dh.Opcode > 0 {
 		header = header | (uint16(1) << 11)
 	}
+	if dh.flags > 0 {
+		header = header | uint16(dh.flags)<<7
+	}
+	if dh.Z > 0 {
+		header = header | uint16(dh.Z)<<4
+	}
+	header = header | uint16(dh.RCode)
 	return header
 }
 
@@ -96,6 +107,10 @@ func (dh *DNSHeader) ToByteBuffer() *bytes.Buffer {
 	ret := new(bytes.Buffer)
 	binary.Write(ret, binary.BigEndian, dh.ID)
 	binary.Write(ret, binary.BigEndian, dh.assembleFlagByte())
+	binary.Write(ret, binary.BigEndian, dh.QDCNT)
+	binary.Write(ret, binary.BigEndian, dh.ANCNT)
+	binary.Write(ret, binary.BigEndian, dh.NSCNT)
+	binary.Write(ret, binary.BigEndian, dh.ARCNT)
 	return ret
 }
 
